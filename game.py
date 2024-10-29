@@ -148,9 +148,6 @@ def main():
 
     pygame.quit()
     sys.exit()
-    sys.exit()
-
-
 
 if __name__ == "__main__":
     main()
