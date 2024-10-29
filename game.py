@@ -126,7 +126,7 @@ def main():
                 obstacle.x + obstacle.width > dinosaur.x and
                 obstacle.y < dinosaur.y + dinosaur.height and
                 obstacle.y + obstacle.height > dinosaur.y):
-                print("Game Over! Your score was:", score)
+                print("Game Over! Your score was: ", score)
                 running = False
 
         # Fill the screen with white
@@ -148,6 +148,8 @@ def main():
 
     pygame.quit()
     sys.exit()
+    sys.exit()
+
 
 
 if __name__ == "__main__":
