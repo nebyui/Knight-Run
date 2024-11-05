@@ -8,43 +8,56 @@ pygame.init()
 # Set up the display
 window_size = (600, 800)
 window = pygame.display.set_mode(window_size)
-pygame.display.set_caption("Dinosaur Dodge")
+pygame.display.set_caption("Knight Dodge")
 
 # Define colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 
 # Constants
 LANE_WIDTH = window_size[0] // 3
 FPS = 60
-OBSTACLE_DELAY = 60  # Delay for obstacle creation (in frames)
-SLIDE_SPEED = 10  # Speed of the dinosaur sliding
+ENEMY_SPAWN_DELAY = 60  # Delay for enemy creation (in frames)
+SLIDE_SPEED = 10  # Speed of the knight sliding
 
-# Set up the Dinosaur
-class Dinosaur:
+# Sprites
+knight_sprite = pygame.image.load('sprites/knight/knight-front.png')
+knight_size = (50, 80)
+knight_sprite = pygame.transform.scale(knight_sprite, knight_size)  # New width and height
+enemy_sprite = pygame.image.load('sprites/enemy/red-enemy-front.png')
+enemy_size = (100, 150)
+enemy_sprite = pygame.transform.scale(enemy_sprite, enemy_size)  # New width and height
+
+knight_hitbox_size = (30, 50)  # Smaller hitbox for the knight
+enemy_hitbox_size = (30, 120)   # Smaller hitbox for enemies
+# Set up the Knight
+class Knight:
     def __init__(self):
-        self.width = LANE_WIDTH // 2
-        self.height = 50
+        self.width = knight_size[0]
+        self.height = knight_size[1]
+        self.hitbox_width = knight_hitbox_size[0]
+        self.hitbox_height = knight_hitbox_size[1]
         self.lane = 1  # Start in the middle lane
-        self.x = (self.lane * LANE_WIDTH) + (LANE_WIDTH // 4)  # Initialize x position
+        self.x = (self.lane * LANE_WIDTH) + ((LANE_WIDTH - self.width) // 2)  # Initialize x position
         self.target_x = self.x  # Set the target_x to the current x position
-        self.y = window_size[1] - self.height - 50
+        self.y = window_size[1] - self.height - 20
 
     def move_left(self):
         if self.lane > 0:
             self.lane -= 1
-        self.target_x = (self.lane * LANE_WIDTH) + (LANE_WIDTH // 4)
+        self.target_x = (self.lane * LANE_WIDTH) + ((LANE_WIDTH - self.width) // 2)
 
     def move_right(self):
         if self.lane < 2:
             self.lane += 1
-        self.target_x = (self.lane * LANE_WIDTH) + (LANE_WIDTH // 4)
+        self.target_x = (self.lane * LANE_WIDTH) + ((LANE_WIDTH - self.width) // 2)
 
     def move_middle(self):
         self.lane = 1  # Move to middle lane
-        self.target_x = (self.lane * LANE_WIDTH) + (LANE_WIDTH // 4)
+        self.target_x = (self.lane * LANE_WIDTH) + ((LANE_WIDTH - self.width) // 2)
 
     def update_position(self):
         # Smoothly move towards the target position
@@ -54,34 +67,73 @@ class Dinosaur:
             self.x -= SLIDE_SPEED
 
     def draw(self, window):
-        pygame.draw.rect(window, GREEN, (self.x, self.y, self.width, self.height))
+        window.blit(knight_sprite, (self.x, self.y))
+
+    def get_hitbox(self):
+        # Return the hitbox rectangle
+        return pygame.Rect(self.x + (self.width - self.hitbox_width) // 2, self.y + (self.height - self.hitbox_height) // 2, self.hitbox_width, self.hitbox_height)
 
 
 # Set up the game clock
 clock = pygame.time.Clock()
 
-# Obstacle Class
-class Obstacle:
+# Enemy Class
+class Enemy:
     def __init__(self, lane):
-        self.width = LANE_WIDTH // 2
-        self.height = 50
-        self.x = (lane * LANE_WIDTH) + (LANE_WIDTH // 4)
+        self.width = enemy_size[0]
+        self.height = enemy_size[1]
+        self.hitbox_width = enemy_hitbox_size[0]
+        self.hitbox_height = enemy_hitbox_size[1]
+        self.x = (lane * LANE_WIDTH) + ((LANE_WIDTH - self.width) // 2)  # Center align the enemy
         self.y = 0  # Start at the top of the screen
+        self.base_speed = 2  # Base speed of falling
+        self.speed_increase_rate = 0.02  # Speed increase per pixel fallen
 
     def fall(self):
-        self.y += 5  # Speed of falling
+        self.speed = self.base_speed + (self.y * self.speed_increase_rate)
+        self.y += self.speed  # Update position
 
     def draw(self, window):
-        pygame.draw.rect(window, RED, (self.x, self.y, self.width, self.height))
+        window.blit(enemy_sprite, (self.x, self.y))
 
+    def get_hitbox(self):
+        # Return the hitbox rectangle
+        return pygame.Rect(self.x + (self.width - self.hitbox_width) // 2, self.y + (self.height - self.hitbox_height) // 2, self.hitbox_width, self.hitbox_height)
+
+
+# Function to draw the play again button
+def draw_play_again_button(window):
+    button_width = 200
+    button_height = 50
+    button_x = (window_size[0] - button_width) // 2
+    button_y = window_size[1] // 2 + 50  # Position it below the game over message
+    pygame.draw.rect(window, BLUE, (button_x, button_y, button_width, button_height))
+    font = pygame.font.Font(None, 36)
+    text = font.render("Play Again", True, WHITE)
+    text_rect = text.get_rect(center=(button_x + button_width // 2, button_y + button_height // 2))
+    window.blit(text, text_rect)
+
+def draw_quit_button(window):
+    button_width = 200
+    button_height = 50
+    button_x = (window_size[0] - button_width) // 2
+    button_y = window_size[1] // 2 + 120  # Position it below the game over message
+    pygame.draw.rect(window, RED, (button_x, button_y, button_width, button_height))
+    font = pygame.font.Font(None, 36)
+    text = font.render("Quit", True, WHITE)
+    text_rect = text.get_rect(center=(button_x + button_width // 2, button_y + button_height // 2))
+    window.blit(text, text_rect)
 
 # Main game loop
 def main():
-    dinosaur = Dinosaur()
-    obstacles = []
+    knight = Knight()
+    enemies = []
     score = 0
-    obstacle_timer = 0  # Timer for obstacle creation
+    enemy_timer = 0  # Timer for enemy creation
     last_lane = -1  # Track the last lane used for spawning
+    font = pygame.font.Font(None, 36)  # Initialize font for rendering text
+
+    game_over = False  # New variable to track game state
 
     running = True
     while running:
@@ -89,58 +141,84 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Get key presses and change the direction
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            dinosaur.move_left()
-        if keys[pygame.K_RIGHT]:
-            dinosaur.move_right()
-        if keys[pygame.K_DOWN]:
-            dinosaur.move_middle()  # Move to middle lane
+            # Handle mouse clicks to play again or quit
+            if game_over and event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+                # Check if "Play Again" button was clicked
+                if (window_size[0] // 2 - 100 < mouse_x < window_size[0] // 2 + 100 and
+                    window_size[1] // 2 + 50 < mouse_y < window_size[1] // 2 + 100):
+                    # Reset game variables
+                    knight = Knight()
+                    enemies.clear()
+                    score = 0
+                    enemy_timer = 0
+                    last_lane = -1
+                    game_over = False
+                
+                # Check if "Quit" button was clicked
+                if (window_size[0] // 2 - 100 < mouse_x < window_size[0] // 2 + 100 and
+                    window_size[1] // 2 + 120 < mouse_y < window_size[1] // 2 + 170):
+                    running = False  # Exit the game
 
-        # Update dinosaur position smoothly
-        dinosaur.update_position()
+        if not game_over:
+            # Get key presses and change the direction
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                knight.move_left()
+            if keys[pygame.K_RIGHT]:
+                knight.move_right()
+            if keys[pygame.K_DOWN]:
+                knight.move_middle()  # Move to middle lane
 
-        # Manage obstacle spawning
-        obstacle_timer += 1
-        if obstacle_timer >= OBSTACLE_DELAY:  
-            lane = random.randint(0, 2)  # Random lane (0, 1, or 2)
+            # Update knight position smoothly
+            knight.update_position()
 
-            # Ensure the new obstacle is not in the same lane as the last one
-            while lane == last_lane:
-                lane = random.randint(0, 2)
+            # Manage enemy spawning
+            enemy_timer += 1
+            if enemy_timer >= ENEMY_SPAWN_DELAY:  
+                lane = random.randint(0, 2)  # Random lane (0, 1, or 2)
 
-            new_obstacle = Obstacle(lane)
-            obstacles.append(new_obstacle)
-            last_lane = lane  # Update the last lane used
-            obstacle_timer = 0  # Reset the timer
+                # Ensure the new enemy is not in the same lane as the last one
+                while lane == last_lane:
+                    lane = random.randint(0, 2)
 
-        for obstacle in obstacles:
-            obstacle.fall()
-            if obstacle.y > window_size[1]:
-                obstacles.remove(obstacle)
-                score += 1  # Increase score for dodging
+                new_enemy = Enemy(lane)
+                enemies.append(new_enemy)
+                last_lane = lane  # Update the last lane used
+                enemy_timer = 0  # Reset the timer
 
-            # Check for collision
-            if (obstacle.x < dinosaur.x + dinosaur.width and
-                obstacle.x + obstacle.width > dinosaur.x and
-                obstacle.y < dinosaur.y + dinosaur.height and
-                obstacle.y + obstacle.height > dinosaur.y):
-                print("Game Over! Your score was:", score)
-                running = False
+            for enemy in enemies:
+                enemy.fall()
+                if enemy.y > window_size[1]:
+                    enemies.remove(enemy)
+                    score += 1  # Increase score for dodging
 
-        # Fill the screen with white
-        window.fill(WHITE)
+                # Check for collision
+                if knight.get_hitbox().colliderect(enemy.get_hitbox()):
+                    final_score = font.render(f"Game Over! Your score was: {score}", True, BLACK)
+                    window.fill(WHITE)  # Fill window to clear previous drawings
+                    window.blit(final_score, (100, 400))  # Draw the game over text
+                    pygame.display.flip()  # Update the display
+                    pygame.time.wait(3000)  # Wait for 3 seconds
+                    game_over = True  # Set game over state
 
-        # Draw the dinosaur and obstacles
-        dinosaur.draw(window)
-        for obstacle in obstacles:
-            obstacle.draw(window)
+        # Fill the screen with white if the game is not over
+        if not game_over:
+            window.fill(WHITE)
 
-        # Render the score
-        font = pygame.font.Font(None, 36)
-        score_text = font.render(f"Score: {score}", True, BLACK)
-        window.blit(score_text, (10, 10))
+            # Draw the knight and enemies
+            knight.draw(window)
+            for enemy in enemies:
+                enemy.draw(window)
+
+            # Render the score
+            score_text = font.render(f"Score: {score}", True, BLACK)
+            window.blit(score_text, (10, 10))
+
+        else:
+            # Draw the Play Again and Quit buttons when game is over
+            draw_play_again_button(window)
+            draw_quit_button(window)
 
         # Update the display
         pygame.display.flip()
@@ -148,7 +226,6 @@ def main():
 
     pygame.quit()
     sys.exit()
-
 
 if __name__ == "__main__":
     main()
