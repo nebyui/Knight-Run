@@ -1,0 +1,6 @@
+*.log
+*.tmp
+/build/
+
+# macOS 
+.DS_Store
