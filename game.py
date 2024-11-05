@@ -24,10 +24,10 @@ ENEMY_SPAWN_DELAY = 60  # Delay for enemy creation (in frames)
 SLIDE_SPEED = 10  # Speed of the knight sliding
 
 # Sprites
-knight_sprite = pygame.image.load('sprites/knight/knight-front.png')
+knight_sprite = pygame.image.load('team-project/sprites/knight/knight-front.png')
 knight_size = (50, 80)
 knight_sprite = pygame.transform.scale(knight_sprite, knight_size)  # New width and height
-enemy_sprite = pygame.image.load('sprites/enemy/red-enemy-front.png')
+enemy_sprite = pygame.image.load('team-project/sprites/enemy/red-enemy-front.png')
 enemy_size = (100, 150)
 enemy_sprite = pygame.transform.scale(enemy_sprite, enemy_size)  # New width and height
 
@@ -124,6 +124,38 @@ def draw_quit_button(window):
     text_rect = text.get_rect(center=(button_x + button_width // 2, button_y + button_height // 2))
     window.blit(text, text_rect)
 
+def start_menu():
+    font = pygame.font.Font(None, 72)
+    title_text = font.render("Knight Dodge", True, BLACK)
+    title_rect = title_text.get_rect(center=(window_size[0] // 2, window_size[1] // 2 - 100))
+    
+    start_button_width = 200
+    start_button_height = 50
+    start_button_x = (window_size[0] - start_button_width) // 2
+    start_button_y = window_size[1] // 2 + 50
+
+    while True:
+        window.fill(WHITE)  # Clear the screen
+        window.blit(title_text, title_rect)
+        pygame.draw.rect(window, BLUE, (start_button_x, start_button_y, start_button_width, start_button_height))
+        text = font.render("Start", True, WHITE)
+        text_rect = text.get_rect(center=(start_button_x + start_button_width // 2, start_button_y + start_button_height // 2))
+        window.blit(text, text_rect)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+                if (start_button_x < mouse_x < start_button_x + start_button_width and
+                        start_button_y < mouse_y < start_button_y + start_button_height):
+                    return True  # Indicate that the game should start
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
 # Main game loop
 def main():
     knight = Knight()
@@ -135,7 +167,9 @@ def main():
 
     game_over = False  # New variable to track game state
 
-    running = True
+    if start_menu():
+        running = True
+    
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
