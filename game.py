@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import os
 
 # Initialize Pygame
 pygame.init()
@@ -9,6 +10,7 @@ pygame.init()
 window_size = (600, 800)
 window = pygame.display.set_mode(window_size)
 pygame.display.set_caption("Knight Dodge")
+current_directory = os.path.dirname(__file__)
 
 # Define colors
 WHITE = (255, 255, 255)
@@ -24,10 +26,15 @@ ENEMY_SPAWN_DELAY = 60  # Delay for enemy creation (in frames)
 SLIDE_SPEED = 10  # Speed of the knight sliding
 
 # Sprites
-knight_sprite = pygame.image.load('team-project/sprites/knight/knight-front.png')
+knight_directory = os.path.join(current_directory, 'sprites', 'knight', 'knight-front.png')
+enemy_directory = os.path.join(current_directory, 'sprites', 'enemy', 'red-enemy-front.png')
+
+
+
+knight_sprite = pygame.image.load(knight_directory)
 knight_size = (50, 80)
 knight_sprite = pygame.transform.scale(knight_sprite, knight_size)  # New width and height
-enemy_sprite = pygame.image.load('team-project/sprites/enemy/red-enemy-front.png')
+enemy_sprite = pygame.image.load(enemy_directory)
 enemy_size = (100, 150)
 enemy_sprite = pygame.transform.scale(enemy_sprite, enemy_size)  # New width and height
 
