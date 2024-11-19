@@ -1,5 +1,5 @@
 import pygame
-import sys
+import sys 
 import random
 import os
 
@@ -32,10 +32,10 @@ enemy_directory = os.path.join(current_directory, 'sprites', 'enemy', 'red-enemy
 
 
 knight_sprite = pygame.image.load(knight_directory)
-knight_size = (50, 80)
+knight_size = (96, 108)
 knight_sprite = pygame.transform.scale(knight_sprite, knight_size)  # New width and height
 enemy_sprite = pygame.image.load(enemy_directory)
-enemy_size = (100, 150)
+enemy_size = (96, 96)
 enemy_sprite = pygame.transform.scale(enemy_sprite, enemy_size)  # New width and height
 
 knight_hitbox_size = (30, 50)  # Smaller hitbox for the knight
