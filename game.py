@@ -27,30 +27,65 @@ SLIDE_SPEED = 10  # Speed of the knight sliding
 
 # Sprites
 knight_directory = os.path.join(current_directory, 'sprites', 'knight', 'knight-front.png')
-enemy_directory = os.path.join(current_directory, 'sprites', 'enemy', 'red-enemy-front.png')
+enemy_directory = os.path.join(current_directory, 'sprites', 'enemy', 'soldier-front.png')
+
+knight_sprite_folder = os.path.join(current_directory, 'sprites', 'knight', 'knight-animation')
 
 
-
-knight_sprite = pygame.image.load(knight_directory)
 knight_size = (96, 108)
-knight_sprite = pygame.transform.scale(knight_sprite, knight_size)  # New width and height
 enemy_sprite = pygame.image.load(enemy_directory)
 enemy_size = (96, 96)
 enemy_sprite = pygame.transform.scale(enemy_sprite, enemy_size)  # New width and height
+
 
 knight_hitbox_size = (30, 50)  # Smaller hitbox for the knight
 enemy_hitbox_size = (30, 120)   # Smaller hitbox for enemies
 # Set up the Knight
 class Knight:
+    
+    
+    
+    
+    
     def __init__(self):
-        self.width = knight_size[0]
-        self.height = knight_size[1]
+
+        
+        self.sprites = []
+        self.sprites.append(pygame.image.load(os.path.join(knight_sprite_folder, 'frame0000.png')))
+        self.sprites.append(pygame.image.load(os.path.join(knight_sprite_folder, 'frame0002.png')))
+        self.sprites.append(pygame.image.load(os.path.join(knight_sprite_folder, 'frame0004.png')))
+        self.sprites.append(pygame.image.load(os.path.join(knight_sprite_folder, 'frame0006.png')))
+        self.current_sprite = 0
+        self.image = self.sprites[self.current_sprite]
+        
+        self.animation_timer = 0
+        self.animation_rate = 10
+        
+        
+        self.width = 96
+        self.height = 108
         self.hitbox_width = knight_hitbox_size[0]
         self.hitbox_height = knight_hitbox_size[1]
         self.lane = 1  # Start in the middle lane
         self.x = (self.lane * LANE_WIDTH) + ((LANE_WIDTH - self.width) // 2)  # Initialize x position
         self.target_x = self.x  # Set the target_x to the current x position
         self.y = window_size[1] - self.height - 20
+        
+    def update(self, window):
+        print("update")
+        self.animation_timer += 1
+        if self.animation_timer >= self.animation_rate:
+            print("timer")
+            self.current_sprite += 1
+            self.animation_timer = 0
+        
+            if self.current_sprite >= 4:
+                print("current sprite")
+                self.current_sprite = 0
+                
+        self.image = self.sprites[self.current_sprite]
+        self.image = pygame.transform.scale(self.image, knight_size)
+        window.blit(self.image, (self.x, self.y))
 
     def move_left(self):
         if self.lane > 0:
@@ -74,7 +109,9 @@ class Knight:
             self.x -= SLIDE_SPEED
 
     def draw(self, window):
-        window.blit(knight_sprite, (self.x, self.y))
+        #window.blit(self.image, (self.x, self.y))
+        pass
+        
 
     def get_hitbox(self):
         # Return the hitbox rectangle
@@ -248,7 +285,7 @@ def main():
             window.fill(WHITE)
 
             # Draw the knight and enemies
-            knight.draw(window)
+            knight.update(window)
             for enemy in enemies:
                 enemy.draw(window)
 
@@ -264,6 +301,8 @@ def main():
         # Update the display
         pygame.display.flip()
         clock.tick(FPS)
+        
+        
 
     pygame.quit()
     sys.exit()
