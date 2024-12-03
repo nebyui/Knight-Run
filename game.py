@@ -76,12 +76,10 @@ class Knight:
 
         self.animation_timer += 1
         if self.animation_timer >= self.animation_rate:
-            print("timer")
             self.current_sprite += 1
             self.animation_timer = 0
         
             if self.current_sprite >= 4:
-                print("current sprite")
                 self.current_sprite = 0
                 
         self.image = self.sprites[self.current_sprite]
