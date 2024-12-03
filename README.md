@@ -5,6 +5,9 @@ Temple Run and Subway Surfers. It is played by using the arrow keys to pick a la
 
 [Software Demo Video](http://youtube.link.goes.here)
 
+HIGHSCORE BOARD
+[Link](url)
+
 # Development Environment
 
 Code was written in VS code.
