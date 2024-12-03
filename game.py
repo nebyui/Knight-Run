@@ -49,7 +49,7 @@ class Knight:
     
     def __init__(self):
 
-        
+        # Adds sprite frames into list
         self.sprites = []
         self.sprites.append(pygame.image.load(os.path.join(knight_sprite_folder, 'frame0000.png')))
         self.sprites.append(pygame.image.load(os.path.join(knight_sprite_folder, 'frame0002.png')))
@@ -58,8 +58,9 @@ class Knight:
         self.current_sprite = 0
         self.image = self.sprites[self.current_sprite]
         
-        self.animation_timer = 0
-        self.animation_rate = 10
+        
+        self.animation_timer = 0 # Keeps track of current frame
+        self.animation_rate = 10 # Animation Framerate
         
         
         self.width = 96
@@ -72,7 +73,7 @@ class Knight:
         self.y = window_size[1] - self.height - 20
         
     def update(self, window):
-        print("update")
+
         self.animation_timer += 1
         if self.animation_timer >= self.animation_rate:
             print("timer")
