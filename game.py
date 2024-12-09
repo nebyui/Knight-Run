@@ -15,7 +15,7 @@ pygame.display.set_caption("Knight Dodge")
 current_directory = os.path.dirname(__file__)
 
 #initalize firebase database
-cred = credentials.Certificate(os.path.join(current_directory, 'game-85891-firebase-adminsdk-nvzq0-923f3539b2.json'))
+cred = credentials.Certificate(os.path.join(current_directory, 'game-85891-firebase-adminsdk-nvzq0-e961c1b011.json'))
 firebase_admin.initialize_app(cred, {
     "databaseURL": "https://game-85891-default-rtdb.firebaseio.com/"
 })
