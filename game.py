@@ -40,6 +40,11 @@ enemy_sprite = pygame.transform.scale(enemy_sprite, enemy_size)  # New width and
 
 knight_hitbox_size = (30, 50)  # Smaller hitbox for the knight
 enemy_hitbox_size = (30, 120)   # Smaller hitbox for enemies
+
+
+
+
+
 # Set up the Knight
 class Knight:
     
@@ -169,7 +174,7 @@ def draw_quit_button(window):
 
 def start_menu():
     font = pygame.font.Font(None, 72)
-    title_text = font.render("Knight Dodge", True, BLACK)
+    title_text = font.render("Knight Run", True, BLACK)
     title_rect = title_text.get_rect(center=(window_size[0] // 2, window_size[1] // 2 - 100))
     
     start_button_width = 200
@@ -207,6 +212,16 @@ def main():
     enemy_timer = 0  # Timer for enemy creation
     last_lane = -1  # Track the last lane used for spawning
     font = pygame.font.Font(None, 36)  # Initialize font for rendering text
+    
+    # Creates instances of background paths and sets initial positions
+    background_directory = os.path.join(current_directory, 'sprites', 'background-path.png')
+    background_paths_image = pygame.image.load(background_directory)
+    background_paths_image = pygame.transform.scale(background_paths_image, window_size)
+    background_height = window_size[1]
+    scroll_speed = 5 
+    background_1_position = 0 # First image starts in the window
+    background_2_position = window_size[1] # Second image starts below the first image, off screen
+    
 
     game_over = False  # New variable to track game state
 
@@ -282,6 +297,22 @@ def main():
         # Fill the screen with white if the game is not over
         if not game_over:
             window.fill(WHITE)
+            
+            # Moves the image positions by the scroll speed value
+            background_1_position += scroll_speed
+            background_2_position += scroll_speed
+        
+            # If the image is completely off screen, it is moved to above the other image
+            if background_1_position >= window_size[1]:
+                background_1_position = background_2_position - background_height
+            if background_2_position >= window_size[1]:
+                background_2_position = background_1_position - background_height
+
+            # Draws images in the game window
+            window.blit(background_paths_image, (0, background_1_position))
+            window.blit(background_paths_image, (0, background_2_position))
+            
+            
 
             # Draw the knight and enemies
             knight.update(window)
@@ -297,9 +328,15 @@ def main():
             draw_play_again_button(window)
             draw_quit_button(window)
 
+        
+
+
         # Update the display
         pygame.display.flip()
         clock.tick(FPS)
+        
+        
+        
         
         
 
