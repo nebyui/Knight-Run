@@ -2,6 +2,8 @@ import pygame
 import sys 
 import random
 import os
+import firebase_admin
+from firebase_admin import credentials, db
 
 # Initialize Pygame
 pygame.init()
@@ -11,6 +13,12 @@ window_size = (600, 800)
 window = pygame.display.set_mode(window_size)
 pygame.display.set_caption("Knight Dodge")
 current_directory = os.path.dirname(__file__)
+
+#initalize firebase database
+cred = credentials.Certificate(os.path.join(current_directory, 'game-85891-firebase-adminsdk-nvzq0-e961c1b011.json'))
+firebase_admin.initialize_app(cred, {
+    "databaseURL": "https://game-85891-default-rtdb.firebaseio.com/"
+})
 
 # Define colors
 WHITE = (255, 255, 255)
@@ -47,11 +55,6 @@ enemy_hitbox_size = (30, 120)   # Smaller hitbox for enemies
 
 # Set up the Knight
 class Knight:
-    
-    
-    
-    
-    
     def __init__(self):
 
         # Adds sprite frames into list
@@ -204,6 +207,22 @@ def start_menu():
         clock.tick(FPS)
 
 
+def save_high_score(score):
+    ref = db.reference('highscores')  # Points to the 'highscores' node
+    ref.push({                         # Adds a new score
+        'score': score
+    })
+    print(f"High score saved: {score}")
+
+def fetch_high_scores(limit=5):
+    ref = db.reference('highscores')
+    scores = ref.order_by_child('score').limit_to_last(limit).get()
+    if not scores:
+        return 0
+    sorted_scores = sorted(scores.values(), key=lambda x: -x['score'])  # Sort descending
+    return sorted_scores[0]['score'] if sorted_scores else 0  # Return the highest score
+
+
 # Main game loop
 def main():
     knight = Knight()
@@ -212,6 +231,7 @@ def main():
     enemy_timer = 0  # Timer for enemy creation
     last_lane = -1  # Track the last lane used for spawning
     font = pygame.font.Font(None, 36)  # Initialize font for rendering text
+    high_score = fetch_high_scores()
     
     # Creates instances of background paths and sets initial positions
     background_directory = os.path.join(current_directory, 'sprites', 'background-path.png')
@@ -246,6 +266,8 @@ def main():
                     enemy_timer = 0
                     last_lane = -1
                     game_over = False
+                        
+                    high_score = fetch_high_scores()
                 
                 # Check if "Quit" button was clicked
                 if (window_size[0] // 2 - 100 < mouse_x < window_size[0] // 2 + 100 and
@@ -288,6 +310,7 @@ def main():
                 # Check for collision
                 if knight.get_hitbox().colliderect(enemy.get_hitbox()):
                     final_score = font.render(f"Game Over! Your score was: {score}", True, BLACK)
+                    save_high_score(score)
                     window.fill(WHITE)  # Fill window to clear previous drawings
                     window.blit(final_score, (100, 400))  # Draw the game over text
                     pygame.display.flip()  # Update the display
@@ -319,9 +342,11 @@ def main():
             for enemy in enemies:
                 enemy.draw(window)
 
-            # Render the score
+            # Render the score and high score
             score_text = font.render(f"Score: {score}", True, BLACK)
+            high_score_text = font.render(f"High Score: {high_score}", True, BLACK)
             window.blit(score_text, (10, 10))
+            window.blit(high_score_text, (200, 10))
 
         else:
             # Draw the Play Again and Quit buttons when game is over
