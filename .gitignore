@@ -4,7 +4,3 @@
 
 # macOS 
 .DS_Store
-
-
-# Ignore Firebase private key
-.json
