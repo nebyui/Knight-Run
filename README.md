@@ -24,12 +24,10 @@ The whole project is written in Python with the pygame library.
 
 # Useful Websites
 
-* [pygame news](https://www.pygame.org/news)
-* [Web Site Name](http://url.link.goes.here)
+* [pygame](https://www.pygame.org/news)
 
 # Future Work
 
-{Make a list of things that you need to fix, improve, and add in the future.}
-* Item 1
-* Item 2
-* Item 3
+* Add different enemy types
+* Add projectiles
+* Improve animations
